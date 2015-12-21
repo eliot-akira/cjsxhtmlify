@@ -1,7 +1,7 @@
 var coffee  = require('coffee-script');
 var through = require('through');
 var convert = require('convert-source-map');
-var cjsx    = require('coffee-react-transform');
+var cjsx    = require('./cjsxhtml-transform');
 
 function isCjsx (file) {
     return (/\.(coffee|cjsx)$/).test(file);

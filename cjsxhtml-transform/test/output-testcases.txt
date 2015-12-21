@@ -1,0 +1,764 @@
+this file contains testcases
+anything within the blocks delimited by double-hash tags
+##like_this
+will be parsed into an object to be used as a testcase
+for example:
+##my_cool_block
+this text will be extracted verbatim. useful for testing code which
+processes text, when the exact characters of the input and output matter
+##end
+however, only configured tags will be matched. everything else will be discarded
+(including everything in this file so far)
+
+##desc
+self closing tag
+##input
+<Person />
+##expected
+React.createElement(Person, null)
+##end
+
+##desc
+ambigious tag-like expression
+##input
+x = a <b > c
+##expected
+x = a <b > c
+##end
+
+##desc
+ambigious tag
+##input
+x = a <b > c </b>
+##expected
+x = a React.createElement("b", null, " c ")
+##end
+
+##desc
+numeric bare attribute
+##input
+x = <table width=100 />
+##expected
+x = React.createElement("table", {"width": 100})
+##end
+
+##desc
+numeric escaped coffeescript attribute
+##input
+x = <table width={100} />
+##expected
+x = React.createElement("table", {"width": (100)})
+##end
+
+##desc
+string attribute
+##input
+x = <table width="100" />
+##expected
+x = React.createElement("table", {"width": "100"})
+##end
+
+##desc
+escaped coffeescript attribute
+##input
+<Person name={ if test() then 'yes' else 'no'} />
+##expected
+React.createElement(Person, {"name": ( if test() then 'yes' else 'no')})
+##end
+
+##desc
+escaped coffeescript attribute over multiple lines
+##input
+<Person name={
+  if test()
+    'yes'
+  else
+    'no'
+} />
+##expected
+React.createElement(Person, {"name": (
+  if test()
+    'yes'
+  else
+    'no'
+)})
+##end
+
+##desc
+multiple line escaped coffeescript with nested cjsx
+##input
+<Person name={
+  if test()
+    'yes'
+  else
+    'no'
+}>
+{
+
+  for n in a
+    <div> a
+      asf
+      <li xy={"as"}>{ n+1 }<a /> <a /> </li>
+    </div>
+}
+
+</Person>
+##expected
+React.createElement(Person, {"name": (
+  if test()
+    'yes'
+  else
+    'no'
+)},
+(
+
+  for n in a
+    React.createElement("div", null, """ a
+      asf
+""", React.createElement("li", {"xy": ("as")}, ( n+1 ), React.createElement("a", null), " ", React.createElement("a", null), " ")
+    )
+)
+
+)
+##end
+
+
+##desc
+nested cjsx within an attribute, with object attr value
+##input
+<Company>
+  <Person name={<NameComponent attr3={ {'a': {}, b: '{'} } />} />
+</Company>
+##expected
+React.createElement(Company, null,
+  React.createElement(Person, {"name": (React.createElement(NameComponent, {"attr3": ( {'a': {}, b: '{'} )}))})
+)
+##end
+
+##desc
+complex nesting
+##input
+<div code={someFunc({a:{b:{}, C:'}{}{'}})} />
+##expected
+React.createElement("div", {"code": (someFunc({a:{b:{}, C:'}{}{'}}))})
+##end
+
+##desc
+multiline tag with nested cjsx within an attribute
+##input
+<Person
+  name={
+    name = formatName(user.name)
+    <NameComponent name={name.toUppercase()} />
+  }
+>
+  blah blah blah
+</Person>
+##expected
+React.createElement(Person, { \
+  "name": (
+    name = formatName(user.name)
+    React.createElement(NameComponent, {"name": (name.toUppercase())})
+  )
+}, """
+  blah blah blah
+""")
+##end
+
+##desc
+escaped coffeescript with nested object literals
+##input
+<Person>
+  blah blah blah {
+    {'a' : {}, 'asd': 'asd'}
+  }
+</Person>
+##expected
+React.createElement(Person, null, """
+  blah blah blah """, (
+    {'a' : {}, 'asd': 'asd'}
+  )
+)
+##end
+
+##desc
+multiline tag attributes with escaped coffeescript
+##input
+<Person name={if isActive() then 'active' else 'inactive'}
+someattr='on new line' />
+##expected
+React.createElement(Person, {"name": (if isActive() then 'active' else 'inactive'),  \
+"someattr": 'on new line'})
+##end
+
+##desc
+example react class with cjsx, text and escaped coffeescript
+##input
+HelloWorld = React.createClass({
+  render: () ->
+    return (
+      <p>
+        Hello, <input type="text" placeholder="Your name here" />!
+        It is {this.props.date.toTimeString()}
+      </p>
+    );
+});
+##expected
+HelloWorld = React.createClass({
+  render: () ->
+    return (
+      React.createElement("p", null, """
+        Hello, """, React.createElement("input", {"type": "text", "placeholder": "Your name here"}), """!
+        It is """, (this.props.date.toTimeString())
+      )
+    );
+});
+##end
+
+##desc
+more complex output
+##input
+setInterval(() ->
+  React.renderComponent(
+    <HelloWorld date="{new Date()}" />,
+    document.getElementById('example')
+  );
+, 500);
+
+React.createClass
+  render: ->
+    return <Nav color="blue">
+      {<Profile>click{Math.random()}</Profile> for i in [start...finish]}
+    </Nav>
+##expected
+setInterval(() ->
+  React.renderComponent(
+    React.createElement(HelloWorld, {"date": "{new Date()}"}),
+    document.getElementById('example')
+  );
+, 500);
+
+React.createClass
+  render: ->
+    return React.createElement(Nav, {"color": "blue"},
+      (React.createElement(Profile, null, "click", (Math.random())) for i in [start...finish])
+    )
+##end
+
+##desc
+lots of attributes
+##input
+
+<Person eyes=2 friends={getFriends()} popular = "yes"
+active={ if isActive() then 'active' else 'inactive' } data-attr='works' checked check=me_out
+/>
+##expected
+
+React.createElement(Person, {"eyes": 2, "friends": (getFriends()), "popular": "yes",  \
+"active": ( if isActive() then 'active' else 'inactive' ), "data-attr": 'works', "checked": true, "check": me_out
+})
+##end
+
+
+##desc
+multiline elements
+##input
+  <div something={
+    do ->
+      test = /432/gm # this is a regex
+      6 /432/gm # this is division
+  }
+  >
+  <div>
+  <div>
+  <div>
+    <article name={ new Date() } number = 203
+     range={getRange()}
+    >
+    </article>
+  </div>
+  </div>
+  </div>
+  </div>
+##expected
+  React.createElement("div", {"something": (
+    do ->
+      test = /432/gm # this is a regex
+      6 /432/gm # this is division
+  )
+  },
+  React.createElement("div", null,
+  React.createElement("div", null,
+  React.createElement("div", null,
+    React.createElement("article", {"name": ( new Date() ), "number": 203,  \
+     "range": (getRange())
+    }
+    )
+  )
+  )
+  )
+  )
+##end
+
+
+
+##desc
+pragma with alternate dom implementation
+##input
+# @cjsx awesome.dom
+<div> a
+  asf
+  <li xy={"as"}>{ n+1 }<a /> <a /> </li>
+</div>
+##expected
+`/** @jsx awesome.dom */`
+awesome.createElement("div", null, """ a
+  asf
+""", awesome.createElement("li", {"xy": ("as")}, ( n+1 ), awesome.createElement("a", null), " ", awesome.createElement("a", null), " ")
+)
+##end
+
+##desc
+pragma is case insensitive
+##input
+# @cJSX cool
+<div> a </div>
+##expected
+`/** @jsx cool */`
+cool.createElement("div", null, " a ")
+##end
+
+##desc
+comment
+##input
+# <Person />
+##expected
+# <Person />
+##end
+
+##desc
+herecomment
+##input
+###
+<Person />
+###
+##expected
+###
+<Person />
+###
+##end
+
+##desc
+regex
+##input
+/<Person \/>/
+##expected
+/<Person \/>/
+##end
+
+##desc
+complex regex
+##input
+<Person />
+/\/\/<Person \/>\>\//
+##expected
+React.createElement(Person, null)
+/\/\/<Person \/>\>\//
+##end
+
+
+##desc
+heregex
+##input
+test = /432/gm # this is a regex
+6 /432/gm # this is division
+<Tag>
+{test = /<Tag>/} <--this is a regex containing something which looks like a tag
+</Tag>
+<Person />
+REGEX = /// ^
+  (/ (?! [\s=] )   # comment comment <comment>comment</comment>
+  [^ [ / \n \\ ]*  # comment comment
+  (?:
+    <Tag />
+    (?: \\[\s\S]   # comment comment
+      | \[         # comment comment
+           [^ \] \n \\ ]*
+           (?: \\[\s\S] [^ \] \n \\ ]* )*
+           <Tag>tag</Tag>
+         ]
+    ) [^ [ / \n \\ ]*
+  )*
+  /) ([imgy]{0,4}) (?!\w)
+///
+<Person />
+##expected
+test = /432/gm # this is a regex
+6 /432/gm # this is division
+React.createElement(Tag, null,
+(test = /<Tag>/), """ \x3C--this is a regex containing something which looks like a tag
+""")
+React.createElement(Person, null)
+REGEX = /// ^
+  (/ (?! [\s=] )   # comment comment <comment>comment</comment>
+  [^ [ / \n \\ ]*  # comment comment
+  (?:
+    <Tag />
+    (?: \\[\s\S]   # comment comment
+      | \[         # comment comment
+           [^ \] \n \\ ]*
+           (?: \\[\s\S] [^ \] \n \\ ]* )*
+           <Tag>tag</Tag>
+         ]
+    ) [^ [ / \n \\ ]*
+  )*
+  /) ([imgy]{0,4}) (?!\w)
+///
+React.createElement(Person, null)
+##end
+
+##desc
+js escaped
+##input
+`<Person />`
+##expected
+`<Person />`
+##end
+
+##desc
+string single quote
+##input
+'<Person />'
+##expected
+'<Person />'
+##end
+
+##desc
+string double quote
+##input
+"<Person />"
+##expected
+"<Person />"
+##end
+
+##desc
+string triple single quote
+##input
+'''<Person />'''
+##expected
+'''<Person />'''
+##end
+
+##desc
+string triple double quote
+##input
+"""<Person />"""
+##expected
+"""<Person />"""
+##end
+
+##desc
+escaped js within cjsx is ignored by parser
+##input
+<Person> `i am not js` </Person>
+##expected
+React.createElement(Person, null, " `i am not js` ")
+##end
+
+##desc
+comment within cjsx is ignored by parser
+##input
+<Person>
+# i am not a comment
+</Person>
+##expected
+React.createElement(Person, null, """
+# i am not a comment
+""")
+##end
+
+##desc
+empty node is handled as expected
+##input
+<Person>
+</Person>
+##expected
+React.createElement(Person, null
+)
+##end
+
+##desc
+cs comment at start of cjsx escape
+##input
+<Person>
+{# i am a comment
+  "i am a string"
+}
+</Person>
+##expected
+React.createElement(Person, null,
+(# i am a comment
+  "i am a string"
+)
+)
+##end
+
+##desc
+cjsx comment is passed through
+##input
+<Person>
+{# i am a comment}
+</Person>
+##expected
+React.createElement(Person, null
+
+)
+##end
+
+##desc
+comment syntax can be used inline
+##input
+<Person>{#comment inline}</Person>
+##expected
+React.createElement(Person, null)
+##end
+
+##desc
+string within cjsx is ignored by parser and escaped
+##input
+<Person> "i am not a string" 'nor am i' </Person>
+##expected
+React.createElement(Person, null, " \"i am not a string\" \'nor am i\' ")
+##end
+
+##desc
+special chars within cjsx are ignored by parser and escaped
+##input
+<Person> a,/';][' a\''@$%^&˚¬∑˜˚∆å∂¬˚*()*&^%$>><<<< '"''"'''\'\'m' i </Person>
+##expected
+React.createElement(Person, null, " a,\x2F\';][\' a\\\'\'@$%^\&˚¬∑˜˚∆å∂¬˚*()*\&^%$\x3E\x3E\x3C\x3C\x3C\x3C \'\"\'\'\"\'\'\'\\\'\\\'m\' i ")
+##end
+
+##desc
+html entities (name, decimal, hex) within cjsx decoded
+##input
+<Person>  &&&&euro;  &#8364; &#x20AC;;; </Person>
+##expected
+React.createElement(Person, null, "  \&\&\&€  € €;; ")
+##end
+
+##desc
+tag with {{}}
+##input
+<Person name={{value: item, key, item}} />
+##expected
+React.createElement(Person, {"name": ({value: item, key, item})})
+##end
+
+##desc
+tag with namespace
+##input
+<Something.Tag></Something.Tag>
+##expected
+React.createElement(Something.Tag, null)
+##end
+
+##desc
+tag with lowercase namespace
+##input
+<something.tag></something.tag>
+##expected
+React.createElement(something.tag, null)
+##end
+
+##desc
+self closing tag with namespace
+##input
+<Something.Tag />
+##expected
+React.createElement(Something.Tag, null)
+##end
+
+##desc
+self closing tag with spread attribute
+##input
+<Component a={b} {... x } b="c" />
+##expected
+React.createElement(Component, React.__spread({"a": (b)},  x , {"b": "c"}))
+##end
+
+##desc
+complex spread attribute
+##input
+<Component {...x} a={b} {... x } b="c" {...$my_xtraCoolVar123 } />
+##expected
+React.createElement(Component, React.__spread({},  x, {"a": (b)},  x , {"b": "c"}, $my_xtraCoolVar123  ))
+##end
+
+##desc
+multiline spread attribute
+##input
+<Component {...
+  x } a={b} {... x } b="c" {...z }>
+</Component>
+##expected
+React.createElement(Component, React.__spread({},  
+  x , {"a": (b)},  x , {"b": "c"}, z )
+)
+##end
+
+##desc
+multiline tag with spread attribute
+##input
+<Component
+  z="1"
+  {...x}
+  a={b}
+  b="c"
+>
+</Component>
+##expected
+React.createElement(Component, React.__spread({ \
+  "z": "1"
+  }, x, { \
+  "a": (b),  \
+  "b": "c"
+})
+)
+##end
+##desc
+multiline tag with spread attribute first
+##input
+<Component
+  {...
+  x}
+  z="1"
+  a={b}
+  b="c"
+>
+</Component>
+##expected
+React.createElement(Component, React.__spread({}, \
+  
+  x, { \
+  "z": "1",  \
+  "a": (b),  \
+  "b": "c"
+})
+)
+##end
+
+##desc
+complex multiline spread attribute
+##input
+<Component
+  {...
+  y} a={b} {... x } b="c" {...z }>
+  <div code={someFunc({a:{b:{}, C:'}'}})} />
+</Component>
+##expected
+React.createElement(Component, React.__spread({}, \
+  
+  y, {"a": (b)},  x , {"b": "c"}, z ),
+  React.createElement("div", {"code": (someFunc({a:{b:{}, C:'}'}}))})
+)
+##end
+
+##desc
+self closing spread attribute on single line
+##input
+<Component a="b" c="d" {...@props} />
+##expected
+React.createElement(Component, React.__spread({"a": "b", "c": "d"}, @props ))
+##end
+
+##desc
+self closing spread attribute on new line
+##input
+<Component
+  a="b"
+  c="d"
+  {...@props}
+/>
+##expected
+React.createElement(Component, React.__spread({ \
+  "a": "b",  \
+  "c": "d"
+  }, @props
+))
+##end
+
+##desc
+self closing spread attribute on same line
+##input
+<Component
+  a="b"
+  c="d"
+  {...@props} />
+##expected
+React.createElement(Component, React.__spread({ \
+  "a": "b",  \
+  "c": "d"
+  }, @props ))
+##end
+
+##desc
+self closing spread attribute on next line
+##input
+<Component
+  a="b"
+  c="d"
+  {...@props}
+
+/>
+##expected
+React.createElement(Component, React.__spread({ \
+  "a": "b",  \
+  "c": "d"
+  }, @props
+
+))
+##end
+
+##desc
+Empty strings are not converted to true
+##input
+<Component val='' />
+<Component val="" />
+##expected
+React.createElement(Component, {"val": ''})
+React.createElement(Component, {"val": ""})
+##end
+
+##desc
+coffeescript @ syntax in tag name
+##input
+<@Component>
+  <Component />
+</@Component>
+##expected
+React.createElement(@Component, null,
+  React.createElement(Component, null)
+)
+##end
+
+
+##desc
+custom element
+##input
+<paper-button className="button">{text}</paper-button>
+##expected
+React.createElement("paper-button", {"className": "button"}, (text))
+##end
+
+##desc
+literate cjsx
+##input
+Don't get caught out by apostrophes.
+
+    console.log <A />
+##expected
+# Don't get caught out by apostrophes.
+
+    console.log React.createElement(A, null)
+##end

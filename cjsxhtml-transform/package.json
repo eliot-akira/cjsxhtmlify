@@ -1,0 +1,36 @@
+{
+  "name": "coffee-jsx-transform",
+  "description": "JSX support for Coffeescript",
+  "keywords": [
+    "coffeescript",
+    "react",
+    "jsx",
+    "cjsx",
+    "coffee-react"
+  ],
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {
+    "test": "cake build && cake test",
+    "prepublish": "cake build"
+  },
+  "files": [
+    "index.js",
+    "lib/",
+    "bin/"
+  ],
+  "bin": {
+    "coffee-jsx-transform": "./bin/coffee-jsx-transform"
+  },
+  "homepage": "https://github.com/jsdf/coffee-react-transform",
+  "bugs": "https://github.com/jsdf/coffee-react-transform/issues",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/eliot-akira/coffee-jsx-transform.git"
+  },
+  "devDependencies": {
+    "coffee-script": "*",
+    "colors": "*",
+    "diff": "*"
+  }
+}

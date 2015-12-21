@@ -1,45 +1,39 @@
 {
-  "name": "cjsxify",
-  "version": "0.3.0",
-  "description": "Browserify transform for CJSX (CoffeeScript equivalent of JSX used in React library by Facebook)",
-  "main": "index.js",
+  "name": "cjsxhtmlify",
+  "version": "0.0.1",
   "dependencies": {
-    "coffee-script": "^1.9.0",
-    "through": "^2.3.6",
-    "convert-source-map": "^0.4.1",
-    "coffee-react-transform": "^3.1.0"
+    "coffee-script": "*",
+    "convert-source-map": "*",
+    "through": "*",
+    "colors": "*",
+    "diff": "*"
   },
+  "description": "Browserify transform for CoffeeScript JSX to HTML",
   "devDependencies": {
-    "browserify": "^9.0.8"
+    "browserify": "*"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:SimonDegraeve/cjsxify.git"
-  },
-  "homepage": "https://github.com/SimonDegraeve/cjsxify",
-  "bugs": "https://github.com/SimonDegraeve/cjsxify/issues",
   "keywords": [
-    "react",
-    "coffee-react",
-    "coffee-script",
     "browserify",
     "browserify-transform",
-    "v2",
+    "cjsx",
+    "coffee-react",
+    "coffee-script",
     "js",
     "jsx",
-    "cjsx",
     "plugin",
-    "transform"
+    "react",
+    "transform",
+    "v2"
   ],
-  "contributors": [
-    {
-      "name": "Simon Degraeve",
-      "email": "simon.degraeve@gmail.com",
-      "url": "https://github.com/SimonDegraeve"
-    }
-  ],
+  "license": "MIT",
+  "main": "index.js",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/eliot-akira/cjsxhtmlify.git"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "license": "MIT"
+  }
 }
