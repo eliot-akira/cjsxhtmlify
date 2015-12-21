@@ -1,33 +1,32 @@
-cjsxify
+cjsxhtmlify
 ====
 
-[Browserify](http://browserify.org/) transform for CJSX (CoffeeScript equivalent of JSX used in [React](http://facebook.github.io/react/) library by Facebook).
+In .babelrc
 
-### Usage
-```coffeescript
-# @cjsx React.DOM
+~~~json
+"plugins": [
+  ["transform-react-jsx", { "pragma": "jsxhtml" }]
+]
+~~~
 
-React = require('react')
+Browserify args in gulpfile
 
-Hello = React.createClass
-  render: ->
-    <div>Hello, {@props.name}!</div>
+~~~javascript
+transform: [ 'cjsxhtmlify', 'babelify' ],
+extensions: ['.coffee','.js']
+~~~
 
-React.renderComponent(<Hello name='World' />, document.getElementById('hello'))
-```
+In application
 
-Save the snippet above as `main.coffee` and then produce a bundle with the following
-command:
+~~~coffee
+require 'jsxhtml'
+~~~
 
-    % browserify -t cjsxify main.coffee -o bundle.js
+Use
 
-`cjsxify` is activated for files with either `.cjsx` extension or `# @cjsx React.DOM` pragma as a first line for any `.coffee` file.
-
-### Installation
-```bash
-npm install cjsxify
-```
-
-### Thanks
-This package is inspired by [coffeeify](https://github.com/jnordberg/coffeeify)/[reactify](https://github.com/andreypopp/reactify) and use [coffee-react-transform](https://github.com/jsdf/coffee-react-transform) to handle `cjsx` transformation to `CoffeeScript`.
-Thanks to the authors for their great work.
+~~~coffee
+template =
+  <div class="something">
+    <b>Yey</b>
+  </div>
+~~~
