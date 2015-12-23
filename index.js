@@ -2,6 +2,7 @@ var coffee  = require('coffee-script');
 var through = require('through');
 var convert = require('convert-source-map');
 var cjsx    = require('./cjsxhtml-transform');
+var jsxhtml = require('jsxhtml');
 
 function isCjsx (file) {
     return (/\.(coffee|cjsx)$/).test(file);
@@ -64,7 +65,7 @@ function compile(file, data, callback) {
     callback(null, compiled.js + '\n' + map.toComment());
 }
 
-function cjsxify(file) {
+function cjsxhtmlify(file) {
     if (!isCjsx(file)) return through();
 
     var data = '', stream = through(write, end);
@@ -84,7 +85,8 @@ function cjsxify(file) {
     }
 }
 
-cjsxify.compile = compile;
-cjsxify.isCjsx = isCjsx;
+cjsxhtmlify.compile = compile;
+cjsxhtmlify.isCjsx = isCjsx;
+cjsxhtmlify.pragma = jsxhtml;
 
-module.exports = cjsxify;
+module.exports = cjsxhtmlify;

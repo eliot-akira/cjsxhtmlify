@@ -3,10 +3,11 @@
   "version": "0.0.1",
   "dependencies": {
     "coffee-script": "*",
-    "convert-source-map": "*",
-    "through": "*",
     "colors": "*",
-    "diff": "*"
+    "convert-source-map": "*",
+    "diff": "*",
+    "jsxhtml": "*",
+    "through": "*",
   },
   "description": "Browserify transform for CoffeeScript JSX to HTML",
   "devDependencies": {
